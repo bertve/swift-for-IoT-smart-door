@@ -167,7 +167,7 @@ class GPIOService {
         Thread.detachNewThread {
             while self.permissionPublishingTempData {
                 if let oT = self.objectTemp {
-                        usleep(50000)
+                        usleep(250000)
                     if let aT = self.ambientTemp {
                         self.display(Int(oT))
                         let tempData = TempData(ambientTemp: aT, objectTemp: oT)
@@ -176,7 +176,7 @@ class GPIOService {
                         self.mqttService.publish(to:"temperature",with: tempData)
                     }
                 }
-                usleep(50000)
+                usleep(250000)
             }
         }
     }

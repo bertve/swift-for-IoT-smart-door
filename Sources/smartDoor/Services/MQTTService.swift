@@ -1,19 +1,21 @@
 import MQTTNIO
 import Foundation
 import NIO
+import NIOSSL
 
 class MQTTService {
 
     var client: MQTTClient
     var jsonEncoder = JSONEncoder()
 
-    init(host: String = "127.0.0.1", port: Int = 1883) {
+    init(host: String = "ac24c670632142bab0a422606038f608.s1.eu.hivemq.cloud", port: Int = 8883) {
         let group = MultiThreadedEventLoopGroup(numberOfThreads: 2)
+        var config = MQTTConfiguration(target: .host( host, port: port))
+        config.credentials = MQTTConfiguration.Credentials(username:"bertve",password:"Swift4iot")
+        config.tls = TLSConfiguration.clientDefault
         self.client = MQTTClient(
-            configuration: .init(
-                target: .host( host, port: port)
-            ),
-            eventLoopGroup: group
+            configuration: config
+            ,eventLoopGroup: group
         )
         client.connect()
     }
