@@ -36,5 +36,6 @@ while signalReceived == 0 {
 }
 
 // cleanup
+print("cleanup")
 controller.switchOff()
 exit(signalReceived)

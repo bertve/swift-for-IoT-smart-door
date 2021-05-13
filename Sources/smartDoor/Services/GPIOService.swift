@@ -162,6 +162,12 @@ class GPIOService {
         } 
     }
 
+    func resetDisplay() {
+        if let display = digitDisplay {
+            display.reset()
+        }
+    }
+
     private func publishTempData(){
         self.permissionPublishingTempData = true
         Thread.detachNewThread {
@@ -178,6 +184,8 @@ class GPIOService {
                 }
                 usleep(250000)
             }
+            // publishing ends 
+            self.resetDisplay()
         }
     }
 
