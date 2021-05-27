@@ -35,7 +35,7 @@ class GPIOService {
         if let led = redLED {
             led.direction = .OUT
         }
-        //TODO: setup green led
+
         greenLED = gpios[.P22]
         if let led = greenLED {
             led.direction = .OUT
@@ -43,60 +43,17 @@ class GPIOService {
 
 
         // setup display
+        let gpioNames : [GPIOName] = [.P14, .P16, .P17, .P4, .P5, .P6, .P7, .P8, .P9, .P15, .P18, .P12]
         var digitDisplayGPIO = [GPIO]()
-        guard let gpioOne = gpios[.P14] else {
-            fatalError("Could not init target 14 gpio")
+        for gpioName in gpioNames {
+            guard let gpio = gpios[gpioName] else {
+                fatalError("Could not init target \(gpioName)")
+            }
+            digitDisplayGPIO.append(gpio)
         }
-        digitDisplayGPIO.append(gpioOne)
-        guard let gpioTwo = gpios[.P16] else {
-            fatalError("Could not init target 16 gpio")
-        }
-        digitDisplayGPIO.append(gpioTwo)
-        guard let gpioThree = gpios[.P17] else {
-            fatalError("Could not init target 17 gpio")
-        }
-        digitDisplayGPIO.append(gpioThree)
-        guard let gpioFour = gpios[.P4] else {
-            fatalError("Could not init target 4 gpio")
-        }
-        digitDisplayGPIO.append(gpioFour)
-        guard let gpioFive = gpios[.P5] else {
-            fatalError("Could not init target 5 gpio")
-        }
-        digitDisplayGPIO.append(gpioFive)
-        guard let gpioSix = gpios[.P6] else {
-            fatalError("Could not init target 6 gpio")
-        }
-        digitDisplayGPIO.append(gpioSix)
-        guard let gpioSeven = gpios[.P7] else {
-            fatalError("Could not init target 7 gpio")
-        }
-        digitDisplayGPIO.append(gpioSeven)
-        guard let gpioEight = gpios[.P8] else {
-            fatalError("Could not init target 8 gpio")
-        }
-        digitDisplayGPIO.append(gpioEight)
-        guard let gpioNine = gpios[.P9] else {
-            fatalError("Could not init target 9 gpio")
-        }
-        digitDisplayGPIO.append(gpioNine)
-        guard let gpioTen = gpios[.P15] else {
-            fatalError("Could not init target 15 gpio")
-        }
-        digitDisplayGPIO.append(gpioTen)
-        guard let gpioEleven = gpios[.P18] else {
-            fatalError("Could not init target 18 gpio")
-        }
-        digitDisplayGPIO.append(gpioEleven)
-        guard let gpioTwelve = gpios[.P12] else {
-            fatalError("Could not init target 12 gpio")
-        }
-        digitDisplayGPIO.append(gpioTwelve)
-
         digitDisplay = DigitDisplay(gpios: digitDisplayGPIO )
 
         if let display = digitDisplay {
-
             Thread.detachNewThread {
                 while true {
                     display.display()
@@ -173,7 +130,8 @@ class GPIOService {
         Thread.detachNewThread {
             while self.permissionPublishingTempData {
                 if let oT = self.objectTemp {
-                        usleep(250000)
+                        // preventing data collision
+                        usleep(100000)
                     if let aT = self.ambientTemp {
                         self.display(Int(oT))
                         let tempData = TempData(ambientTemp: aT, objectTemp: oT)
@@ -182,7 +140,6 @@ class GPIOService {
                         self.mqttService.publish(to:"temperature",with: tempData)
                     }
                 }
-                usleep(250000)
             }
             // publishing ends 
             self.resetDisplay()
